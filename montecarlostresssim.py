@@ -1,13 +1,8 @@
-# --- Reopened canvas (no functional change) ---
-# monte_carlo_gui_pg.py
-# Monte Carlo RoR simulator (PyQtGraph) — performance tuned for 4K
-# Dark theme version (charcoal background, white text)
-# + Presets with persistence (QSettings)
+# Monte Carlo RoR simulator (PyQtGraph)
 
 from __future__ import annotations
 import sys, time, json
 import numpy as np
-from pathlib import Path
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 import pyqtgraph as pg
@@ -885,22 +880,6 @@ class App(QtWidgets.QMainWindow):
         <h3>4) Outputs — how they’re computed</h3>
         <ul>
             <li><b>Expectancy (R) per trade</b>: in R-multiples <code>E[R] = p·R − (1−p)</code> (independent of r and c).</li>
-            <li><b>Sample Ending Equity</b>: terminal equity of the displayed sample path.</li>
-            <li><b>Median Ending Equity</b>: 50th percentile of terminal equity across all S paths.</li>
-            <li><b>Sample / Median Max Drawdown (%)</b>:
-                <code>DD_t = 1 − E_t/peak_t</code>; take the maximum over t for each path; median is the 50th percentile.</li>
-            <li><b>Arithmetic MPTM</b> (mean per-trade multiplier):
-            <div style='margin-top:6px'>
-            If ΔR = 0: <code>μ_M = p·(1+rR) + (1−p)·(1−r)</code><br>
-            If ΔR &gt; 0: use <code>\\bar{R} = (max(0,R−ΔR) + (R+ΔR))/2</code> in place of R.
-            </div>
-            </li>
-            <li><b>Geo. Median multiplier</b>:
-                <code>(MedianEnd / E_0)^{1/N}</code> — the per-trade factor that maps start to median end.</li>
-            <li><b>Sigma (% / trade)</b>:
-                standard deviation of sample per-trade returns <code>r_s(t) = (E_{t+1}−E_t)/E_t</code>.</li>
-            <li><b>Beta (vs median)</b>:
-                let benchmark returns be <code>r_b</code> from the median path, then <code>β = Cov(r_s,r_b)/Var(r_b)</code>.</li>
             <li><b>Alpha (% / trade)</b>:
                 <code>α = mean(r_s − β r_b)</code>, i.e., average excess return of sample over beta-scaled median.</li>
             <li><b>Prob. of Ruin</b>:
@@ -927,7 +906,6 @@ class App(QtWidgets.QMainWindow):
             <li><b>R-multiple</b>: outcome measured in units of risk (<code>r×E_t</code>).</li>
             <li><b>Drawdown</b>: <code>1 − E/peak</code>.</li>
             <li><b>Median path</b>: per-index 50th-percentile equity across paths.</li>
-            <li><b>Volatility (Sigma)</b>: variability of per-trade returns.</li>
             <li><b>Beta / Alpha</b>: sensitivity and excess return vs. the benchmark (median path).</li>
         </ul>
         </div>
@@ -1074,15 +1052,7 @@ class App(QtWidgets.QMainWindow):
 
         rows = [
             ("Expectancy (R)",            f"{exp_R:.3f}"),
-            ("Sample Ending Equity ($)",  f"{sample_end:,.0f}"),
-            ("Median Ending Equity ($)",  f"{med_end:,.0f}"),
             ("Prob. of Ruin (%)",         f"{prob_ruin*100:.2f}"),
-            ("Sample Max DD (%)",         f"{sample_mdd*100:.1f}"),
-            ("Median Max DD (%)",         f"{med_dd*100:.1f}"),
-            ("Arithmetic MPTM",           f"{per_trade_mult_mean:.5f}"),
-            ("Geo. Median",               f"{geo_med_mult:.5f}"),
-            ("Sigma (% / trade)",         f"{sigma_pt*100:.2f}"),
-            ("Beta (vs median)",          f"{beta_capm:.3f}"),
             ("Alpha (% / trade)",         f"{alpha_capm*100:.2f}"),
         ]
         self.table.setRowCount(len(rows))
